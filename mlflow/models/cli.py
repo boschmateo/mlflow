@@ -83,6 +83,7 @@ def multi_serve(model_uri, port, host, workers, no_conda=False, install_mlflow=F
             "data": [[1, 2, 3], [4, 5, 6]]
         }'
     """
+    print("Multi serve requested")
     return _get_flavor_backend(
         model_uri, no_conda=no_conda, workers=workers, install_mlflow=install_mlflow
     ).multi_serve(model_uri=model_uri, port=port, host=host)

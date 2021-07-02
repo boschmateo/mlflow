@@ -102,6 +102,7 @@ class PyFuncBackend(FlavorBackend):
         """
         Serve pyfunc model locally.
         """
+        print("In multi_serve")
         local_path = _download_artifact_from_uri(model_uri)
         # NB: Absolute windows paths do not work with mlflow apis, use file uri to ensure
         # platform compatibility.
@@ -109,12 +110,12 @@ class PyFuncBackend(FlavorBackend):
         if os.name != "nt":
             command = (
                 "gunicorn --timeout=60 -b {host}:{port} -w {nworkers} ${{GUNICORN_CMD_ARGS}}"
-                " -- mlflow.pyfunc.scoring_server.wsgi:app"
+                " -- mlflow.pyfunc.multi_scoring_server.wsgi:app"
             ).format(host=host, port=port, nworkers=self._nworkers)
         else:
             command = (
                 "waitress-serve --host={host} --port={port} "
-                "--ident=mlflow mlflow.pyfunc.scoring_server.wsgi:app"
+                "--ident=mlflow mlflow.pyfunc.multi_scoring_server.wsgi:app"
             ).format(host=host, port=port)
 
         command_env = os.environ.copy()

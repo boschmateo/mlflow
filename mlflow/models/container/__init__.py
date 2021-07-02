@@ -91,8 +91,10 @@ def _multiserve():
         serving_flavor = pyfunc.FLAVOR_NAME
 
     if serving_flavor == mleap.FLAVOR_NAME:
+        print("_serve_mleap")
         _serve_mleap()
     elif pyfunc.FLAVOR_NAME in m.flavors:
+        print("_serve_pyfunc")
         _serve_pyfunc(m)
     else:
         raise Exception("This container only supports models with the MLeap or PyFunc flavors.")
