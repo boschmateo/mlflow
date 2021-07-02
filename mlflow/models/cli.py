@@ -56,7 +56,7 @@ def serve(model_uri, port, host, workers, no_conda=False, install_mlflow=False):
     ).serve(model_uri=model_uri, port=port, host=host)
 
 
-@commands.command("multi")
+@commands.command("multi_serve")
 @cli_args.MODEL_URI
 @cli_args.PORT
 @cli_args.HOST
