@@ -74,16 +74,17 @@ def init():
     #     status = 200 if health else 404
     #     return flask.Response(response="\n", status=status, mimetype="application/json")
 
-    @app.route("/invocations/<model_uri>", methods=["POST"])
+    @app.route("/invocations/<model_uri>/<version>", methods=["POST"])
     @app.param("model_uri", "The desired model uri")
     @catch_mlflow_exception
-    def transformation(model_uri):  # pylint: disable=unused-variable
+    def transformation(model_uri, version):  # pylint: disable=unused-variable
         """
         Do an inference on a single batch of data. In this sample server,
         we take data as CSV or json, convert it to a Pandas DataFrame or Numpy,
         generate predictions and convert them back to json.
         """
-        model = get_desired_model(model_uri)
+        print("IN /invocations/<model_uri>/<version>")
+        model = get_desired_model("models:/{uri}/{version}".format(uri=model_uri, version=version))
         input_schema = model.metadata.get_input_schema()
 
         # Convert from CSV to pandas
