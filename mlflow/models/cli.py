@@ -56,6 +56,38 @@ def serve(model_uri, port, host, workers, no_conda=False, install_mlflow=False):
     ).serve(model_uri=model_uri, port=port, host=host)
 
 
+@commands.command("multi")
+@cli_args.MODEL_URI
+@cli_args.PORT
+@cli_args.HOST
+@cli_args.WORKERS
+@cli_args.NO_CONDA
+@cli_args.INSTALL_MLFLOW
+def multi_serve(model_uri, port, host, workers, no_conda=False, install_mlflow=False):
+    """
+    Serve a model saved with MLflow by launching a webserver on the specified host and port.
+    The command supports models with the ``python_function`` or ``crate`` (R Function) flavor.
+    For information about the input data formats accepted by the webserver, see the following
+    documentation: https://www.mlflow.org/docs/latest/models.html#built-in-deployment-tools.
+
+    You can make requests to ``POST /invocations`` in pandas split- or record-oriented formats.
+
+    Example:
+
+    .. code-block:: bash
+
+        $ mlflow models serve -m runs:/my-run-id/model-path &
+
+        $ curl http://127.0.0.1:5000/invocations -H 'Content-Type: application/json' -d '{
+            "columns": ["a", "b", "c"],
+            "data": [[1, 2, 3], [4, 5, 6]]
+        }'
+    """
+    return _get_flavor_backend(
+        model_uri, no_conda=no_conda, workers=workers, install_mlflow=install_mlflow
+    ).multi_serve(model_uri=model_uri, port=port, host=host)
+
+
 @commands.command("predict")
 @cli_args.MODEL_URI
 @click.option(

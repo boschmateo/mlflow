@@ -98,6 +98,39 @@ class PyFuncBackend(FlavorBackend):
             else:
                 subprocess.Popen(command, env=command_env).wait()
 
+    def multi_serve(self, model_uri, port, host):
+        """
+        Serve pyfunc model locally.
+        """
+        local_path = _download_artifact_from_uri(model_uri)
+        # NB: Absolute windows paths do not work with mlflow apis, use file uri to ensure
+        # platform compatibility.
+        local_uri = path_to_local_file_uri(local_path)
+        if os.name != "nt":
+            command = (
+                "gunicorn --timeout=60 -b {host}:{port} -w {nworkers} ${{GUNICORN_CMD_ARGS}}"
+                " -- mlflow.pyfunc.scoring_server.wsgi:app"
+            ).format(host=host, port=port, nworkers=self._nworkers)
+        else:
+            command = (
+                "waitress-serve --host={host} --port={port} "
+                "--ident=mlflow mlflow.pyfunc.scoring_server.wsgi:app"
+            ).format(host=host, port=port)
+
+        command_env = os.environ.copy()
+        command_env[scoring_server._SERVER_MODEL_PATH] = local_uri
+        if not self._no_conda and ENV in self._config:
+            conda_env_path = os.path.join(local_path, self._config[ENV])
+            return _execute_in_conda_env(
+                conda_env_path, command, self._install_mlflow, command_env=command_env
+            )
+        else:
+            _logger.info("=== Running command '%s'", command)
+            if os.name != "nt":
+                subprocess.Popen(["bash", "-c", command], env=command_env).wait()
+            else:
+                subprocess.Popen(command, env=command_env).wait()
+
     def can_score_model(self):
         if self._no_conda:
             # noconda => already in python and dependencies are assumed to be installed.
