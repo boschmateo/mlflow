@@ -75,7 +75,6 @@ def init():
     #     return flask.Response(response="\n", status=status, mimetype="application/json")
 
     @app.route("/invocations/<model_uri>/<version>", methods=["POST"])
-    @app.param("model_uri", "The desired model uri")
     @catch_mlflow_exception
     def transformation(model_uri, version):  # pylint: disable=unused-variable
         """
