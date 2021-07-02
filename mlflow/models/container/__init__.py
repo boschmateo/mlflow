@@ -74,6 +74,7 @@ def _serve():
     else:
         raise Exception("This container only supports models with the MLeap or PyFunc flavors.")
 
+
 def _multiserve():
     """
     Serve the model.
@@ -147,7 +148,7 @@ def _serve_pyfunc(model):
         if not os.environ.get(DISABLE_ENV_CREATION) == "true":
             _install_pyfunc_deps(MODEL_PATH, install_mlflow=True)
         bash_cmds += ["source /miniconda/bin/activate custom_env"]
-    nginx_conf = resource_filename(mlflow.models.__name__, "container/scoring_server/nginx.conf")
+    nginx_conf = resource_filename(mlflow.models.__name__, "container/multi_scoring_server/nginx.conf")
 
     # option to disable manually nginx. The default behavior is to enable nginx.
     start_nginx = False if os.getenv(DISABLE_NGINX, "false").lower() == "true" else True
@@ -166,7 +167,7 @@ def _serve_pyfunc(model):
     os.system('python -c"from mlflow.version import VERSION as V; print(V)"')
     cmd = (
         "gunicorn -w {cpu_count} ".format(cpu_count=cpu_count)
-        + "${GUNICORN_CMD_ARGS} mlflow.models.container.scoring_server.wsgi:app"
+        + "${GUNICORN_CMD_ARGS} mlflow.models.container.multi_scoring_server.wsgi:app"
     )
     bash_cmds.append(cmd)
     gunicorn = Popen(["/bin/bash", "-c", " && ".join(bash_cmds)])

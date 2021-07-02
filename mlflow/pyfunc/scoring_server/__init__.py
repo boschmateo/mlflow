@@ -223,6 +223,7 @@ def init(model: PyFuncModel):
         we take data as CSV or json, convert it to a Pandas DataFrame or Numpy,
         generate predictions and convert them back to json.
         """
+        print("In single serve")
         # Convert from CSV to pandas
         if flask.request.content_type == CONTENT_TYPE_CSV:
             data = flask.request.data.decode("utf-8")
